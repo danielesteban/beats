@@ -55,7 +55,7 @@ class Spectrum extends InstancedMesh {
       instance.position
         .set(
           Math.random() * 2 - 1,
-          Math.random() * 1.5 - 0.5,
+          Math.random() * 1 - 0.25,
           Math.random() * 2 - 1
         )
         .normalize()
