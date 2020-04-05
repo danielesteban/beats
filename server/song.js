@@ -45,21 +45,21 @@ class Song extends Room {
         ) {
           return;
         }
-        track = tracks[track];
+        const { type, page, pages } = tracks[track];
         if (
           Number.isNaN(x)
           || x < 0
           || x >= Song.steps
           || Number.isNaN(y)
           || y < 0
-          || y >= Song.voices[track.type]
+          || y >= Song.voices[type]
           || Number.isNaN(isOn)
           || isOn < 0
           || isOn > 1
         ) {
           return;
         }
-        track.pages[track.page][(y * Song.steps) + x] = isOn;
+        pages[page][(y * Song.steps) + x] = isOn;
         this.broadcast({
           type: 'SET',
           data: {
