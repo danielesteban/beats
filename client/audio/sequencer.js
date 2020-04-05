@@ -11,6 +11,7 @@ class Sequencer {
     });
     const [analyser] = this.main.filters;
     this.main.analyser = analyser;
+    this.main.gain = 0.5;
     this.main.output.connect(listener.getInput());
     this.syncTimeOffset();
   }
