@@ -32,11 +32,12 @@ class Room extends Scene {
     this.spectrum = new Spectrum();
     this.add(this.spectrum);
 
-    this.player.position.set(
-      Math.floor(Math.random() * 4) - 1.5,
-      0,
-      Math.floor(Math.random() * 4) - 1.5
-    );
+    this.sequencer.main.muted = true;
+    // this.player.position.set(
+    //   Math.floor(Math.random() * 4) - 1.5,
+    //   0,
+    //   Math.floor(Math.random() * 4) - 1.5
+    // );
   }
 
   onBeforeRender(renderer, scene, camera) {
@@ -171,12 +172,12 @@ class Room extends Scene {
         1.2,
         -3
       );
-      display.rotateX(Math.PI * -0.25);
+      display.rotateX(Math.PI * -0.2);
       display.update(state);
       {
         const backplate = new Wall({ width: 10, height: 10, light: 0.6 });
         backplate.scale.set(0.16, 0.105, 1);
-        backplate.position.z = -0.05;
+        backplate.position.z = -0.025;
         display.add(backplate);
       }
       {
@@ -195,20 +196,20 @@ class Room extends Scene {
         buttons.update([[...Array(pages.length)].map((v, i) => (i === page ? 1 : 0))]);
         buttons.scale.set(1, 1, 0.25);
         buttons.position.set(0, -0.59, 0.064);
-        buttons.rotateX(Math.PI * -0.25);
+        buttons.rotateX(Math.PI * -0.2);
         display.pages = buttons;
         display.add(buttons);
         displays.push(buttons);
         const backplate = new Wall({ width: 10, height: 1, light: 0.6 });
         backplate.position.set(0, -0.6, 0.05);
         backplate.scale.set(0.16, 0.16, 1);
-        backplate.rotateX(Math.PI * -0.25);
+        backplate.rotateX(Math.PI * -0.2);
         display.add(backplate);
       }
       {
         const stand = new Stand();
-        stand.position.set(0, 0, -0.15);
-        stand.rotateX(Math.PI * 0.25);
+        stand.position.set(0, 0, -0.2);
+        stand.rotateX(Math.PI * 0.2);
         display.add(stand);
       }
       displays.push(display);

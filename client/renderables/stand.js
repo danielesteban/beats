@@ -10,7 +10,7 @@ import {
 
 class Stand extends Mesh {
   static setupGeometry() {
-    const box = new BoxGeometry(0.25, 1, 0.25, 4, 6, 4);
+    const box = new BoxGeometry(0.25, 1.15, 0.25, 4, 6, 4);
     box.faces.forEach((face, i) => {
       if (i % 2 === 1) {
         face.color.setHSL(0, 0, 0.015 - Math.random() * 0.01);
