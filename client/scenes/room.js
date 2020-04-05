@@ -32,11 +32,11 @@ class Room extends Scene {
     this.spectrum = new Spectrum();
     this.add(this.spectrum);
 
-    // this.player.position.set(
-    //   Math.floor(Math.random() * 4) - 1.5,
-    //   0,
-    //   Math.floor(Math.random() * 4) - 1.5
-    // );
+    this.player.position.set(
+      Math.floor(Math.random() * 4) - 1.5,
+      0,
+      Math.floor(Math.random() * 4) - 1.5
+    );
   }
 
   onBeforeRender(renderer, scene, camera) {
@@ -221,7 +221,7 @@ class Room extends Scene {
     const { auxVector, displays } = this;
     for (let i = 0; i < displays.length; i += 1) {
       const display = displays[i];
-      if (display.intersect.worldToLocal(auxVector.copy(position)).z <= 1) {
+      if (Math.abs(display.intersect.worldToLocal(auxVector.copy(position)).z) <= 1) {
         let { x, y } = auxVector;
         x += 0.5;
         y = 1 - (y + 0.5);

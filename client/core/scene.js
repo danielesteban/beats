@@ -57,7 +57,7 @@ class Scene extends ThreeScene {
       }
       if (
         !player.destination
-        && hand.handedness === 'left'
+        && hand.handedness === 'right'
         && (forwards || forwardsUp)
       ) {
         const { hit, points } = CurveCast({
