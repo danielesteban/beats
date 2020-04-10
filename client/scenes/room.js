@@ -1,9 +1,10 @@
 import Display from '../renderables/display.js';
 import Escher from '../renderables/escher.js';
-import { FogExp2, Vector3 } from '../core/three.js';
+import { FogExp2, Object3D, Vector3 } from '../core/three.js';
 import Scene from '../core/scene.js';
 import Sequencer from '../audio/sequencer.js';
 import SequencerDisplay from '../renderables/sequencerDisplay.js';
+import Shadow from '../renderables/shadow.js';
 import Spectrum from '../renderables/spectrum.js';
 import Stand from '../renderables/stand.js';
 import Translocable from '../renderables/translocable.js';
@@ -32,11 +33,12 @@ class Room extends Scene {
     this.spectrum = new Spectrum();
     this.add(this.spectrum);
 
-    this.player.position.set(
-      Math.floor(Math.random() * 4) - 1.5,
-      0,
-      Math.floor(Math.random() * 4) - 1.5
-    );
+    this.sequencer.main.muted = true;
+    // this.player.position.set(
+    //   Math.floor(Math.random() * 4) - 1.5,
+    //   0,
+    //   Math.floor(Math.random() * 4) - 1.5
+    // );
   }
 
   onBeforeRender(renderer, scene, camera) {
@@ -146,9 +148,9 @@ class Room extends Scene {
     const { displays, sequencer } = this;
     displays.length = 0;
     if (sequencer.tracks) {
-      sequencer.tracks.forEach(({ display }) => {
-        this.remove(display);
+      sequencer.tracks.forEach(({ display, machine }) => {
         display.dispose();
+        this.remove(machine);
       });
     }
     sequencer.init(data);
@@ -166,13 +168,7 @@ class Room extends Scene {
       });
       display.type = 'track';
       display.track = track;
-      const angle = Math.PI * (track * 0.2 - 0.2);
-      display.position.set(
-        Math.cos(angle - Math.PI * 0.5) * 3.75,
-        1.2,
-        Math.sin(angle - Math.PI * 0.5) * 3.75 - 0.5
-      );
-      display.rotateY(-angle);
+      display.position.y = 1.25;
       display.rotateX(Math.PI * -0.2);
       display.update(state);
       {
@@ -207,15 +203,21 @@ class Room extends Scene {
         backplate.rotateX(Math.PI * -0.2);
         display.add(backplate);
       }
-      {
-        const stand = new Stand();
-        stand.position.set(0, 0, -0.2);
-        stand.rotateX(Math.PI * 0.2);
-        display.add(stand);
-      }
       displays.push(display);
+      const machine = new Object3D();
+      machine.add(new Shadow({ width: 2, length: 1 }));
+      machine.add(new Stand());
+      const angle = Math.PI * (track * 0.2 - 0.2);
+      machine.position.set(
+        Math.cos(angle - Math.PI * 0.5) * 3.75,
+        0,
+        Math.sin(angle - Math.PI * 0.5) * 3.75 - 0.5
+      );
+      machine.rotateY(-angle);
+      machine.add(display);
+      this.add(machine);
       sequencer.tracks[track].display = display;
-      this.add(display);
+      sequencer.tracks[track].machine = machine;
     });
   }
 
