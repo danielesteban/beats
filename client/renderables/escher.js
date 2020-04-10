@@ -25,9 +25,9 @@ class Escher extends InstancedMesh {
       return box;
     };
     const merged = new Geometry();
-    merged.merge(box(20, 1, 1).translate(0, 0, -10));
-    merged.merge(box(1, 1, 20).translate(-10, 0, 0));
-    merged.merge(box(1, 20, 1).translate(-10, 0, -10));
+    merged.merge(box(20, 1, 1).translate(0, 0, -10.5));
+    merged.merge(box(1, 1, 20).translate(-10.5, 0, 0));
+    merged.merge(box(1, 21, 1).translate(-10.5, 0, -10.5));
     Escher.geometry = (new BufferGeometry()).fromGeometry(merged);
     Escher.geometry.computeBoundingSphere();
   }
@@ -62,9 +62,9 @@ class Escher extends InstancedMesh {
         for (let x = -radius; x <= radius; x += 1, i += 1) {
           const instance = new Object3D();
           instance.position.set(
-            x * 20,
-            y * 20,
-            z * 20
+            x * 21,
+            y * 21,
+            z * 21
           );
           instance.updateMatrix();
           instance.worldSphere = Escher.geometry.boundingSphere
