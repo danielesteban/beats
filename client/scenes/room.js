@@ -33,12 +33,11 @@ class Room extends Scene {
     this.spectrum = new Spectrum();
     this.add(this.spectrum);
 
-    this.sequencer.main.muted = true;
-    // this.player.position.set(
-    //   Math.floor(Math.random() * 4) - 1.5,
-    //   0,
-    //   Math.floor(Math.random() * 4) - 1.5
-    // );
+    this.player.position.set(
+      Math.floor(Math.random() * 4) - 1.5,
+      0,
+      Math.floor(Math.random() * 4) - 1.5
+    );
   }
 
   onBeforeRender(renderer, scene, camera) {
