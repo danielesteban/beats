@@ -69,7 +69,7 @@ class Spectrum extends InstancedMesh {
   update({ animation: { delta }, bands }) {
     const { instances } = this;
     instances.forEach((instance, i) => {
-      const scale = 0.1 + ((bands[instance.band] / 200) * instance.scalar * 2);
+      const scale = 0.1 + ((Math.min(bands[instance.band], 200) / 200) * instance.scalar * 2);
       instance.scale.set(scale, scale, scale);
       instance.updateMatrix();
       this.setMatrixAt(i, instance.matrix);
