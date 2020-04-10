@@ -39,7 +39,7 @@ class Spectrum extends InstancedMesh {
     if (!Spectrum.material) {
       Spectrum.setupMaterial();
     }
-    const count = 100;
+    const count = 80;
     super(
       Spectrum.geometry,
       Spectrum.material,
