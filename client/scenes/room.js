@@ -176,8 +176,8 @@ class Room extends Scene {
       display.rotateX(Math.PI * -0.2);
       display.update(state);
       {
-        const backplate = new Wall({ width: 10, height: 10, light: 0.6 });
-        backplate.scale.set(0.21, 0.105, 1);
+        const backplate = new Wall({ width: 20, height: 10, light: 0.6 });
+        backplate.scale.set(0.105, 0.105, 1);
         backplate.position.z = -0.025;
         display.add(backplate);
       }
@@ -201,9 +201,9 @@ class Room extends Scene {
         display.pages = buttons;
         display.add(buttons);
         displays.push(buttons);
-        const backplate = new Wall({ width: 10, height: 1, light: 0.6 });
+        const backplate = new Wall({ width: 15, height: 1, light: 0.6 });
         backplate.position.set(0, -0.6, 0.05);
-        backplate.scale.set(0.16, 0.16, 1);
+        backplate.scale.set(0.105, 0.16, 1);
         backplate.rotateX(Math.PI * -0.2);
         display.add(backplate);
       }
