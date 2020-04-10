@@ -79,7 +79,7 @@ class Channel {
     const analyser = context.createAnalyser();
     analyser.fftSize = 4096;
     const buffer = new Uint8Array(analyser.frequencyBinCount);
-    const bands = [2, 4, 9, 18, 38, 78, 160, 331, 683];
+    const bands = [2, 4, 8, 16, 32, 64, 128, 256, 512];
     const bins = new Uint8Array(8);
     analyser.getBands = () => {
       analyser.getByteFrequencyData(buffer);
