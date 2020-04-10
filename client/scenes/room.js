@@ -156,7 +156,7 @@ class Room extends Scene {
       const state = pages[page];
       const display = new SequencerDisplay({
         size: {
-          x: 1.5,
+          x: 2,
           y: Math.max(state.length / 8, 0.8),
         },
         resolution: {
@@ -166,16 +166,18 @@ class Room extends Scene {
       });
       display.type = 'track';
       display.track = track;
+      const angle = Math.PI * (track * 0.2 - 0.2);
       display.position.set(
-        track * 2 - 2,
+        Math.cos(angle - Math.PI * 0.5) * 3.75,
         1.2,
-        -3
+        Math.sin(angle - Math.PI * 0.5) * 3.75 - 0.5
       );
+      display.rotateY(-angle);
       display.rotateX(Math.PI * -0.2);
       display.update(state);
       {
         const backplate = new Wall({ width: 10, height: 10, light: 0.6 });
-        backplate.scale.set(0.16, 0.105, 1);
+        backplate.scale.set(0.21, 0.105, 1);
         backplate.position.z = -0.025;
         display.add(backplate);
       }
