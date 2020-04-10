@@ -39,19 +39,16 @@ class Spectrum extends InstancedMesh {
     if (!Spectrum.material) {
       Spectrum.setupMaterial();
     }
-    const count = 80;
     super(
       Spectrum.geometry,
       Spectrum.material,
-      count
+      Spectrum.count
     );
     this.instances = [];
-    let band = 0;
-    for (let i = 0; i < count; i += 1) {
+    for (let i = 0; i < Spectrum.count; i += 1) {
       const instance = new Object3D();
-      instance.band = band;
+      instance.band = i % 8;
       instance.scalar = 0.5 + Math.random() * 0.5;
-      band = (band + 1) % 8;
       instance.position
         .set(
           Math.random() * 2 - 1,
@@ -78,5 +75,7 @@ class Spectrum extends InstancedMesh {
     this.rotateY(delta * 0.05);
   }
 }
+
+Spectrum.count = 80;
 
 export default Spectrum;
