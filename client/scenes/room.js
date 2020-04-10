@@ -48,7 +48,7 @@ class Room extends Scene {
       server,
       spectrum,
     } = this;
-    SequencerDisplay.updateMaterialSequence(sequencer.sequence);
+    SequencerDisplay.updateMaterial(sequencer);
     background.updateFrustum(camera);
     player.controllers.forEach((controller) => {
       const {
@@ -125,7 +125,7 @@ class Room extends Scene {
         track.page = data.page;
         track.display.update(track.pages[track.page]);
         track.display.pages.update(
-          [[...Array(track.pages.length)].map((v, i) => (i === track.page ? 1 : 0))]
+          [...Array(track.pages.length)].map((v, i) => (i === track.page ? 1 : 0))
         );
         break;
       }
@@ -192,7 +192,7 @@ class Room extends Scene {
         });
         buttons.type = 'page';
         buttons.track = track;
-        buttons.update([[...Array(pages.length)].map((v, i) => (i === page ? 1 : 0))]);
+        buttons.update([...Array(pages.length)].map((v, i) => (i === page ? 1 : 0)));
         buttons.scale.set(1, 1, 0.25);
         buttons.position.set(0, -0.59, 0.064);
         buttons.rotateX(Math.PI * -0.2);

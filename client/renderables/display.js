@@ -39,19 +39,12 @@ class Display extends InstancedMesh {
   static setupMaterial() {
     const material = new ShaderMaterial({
       name: 'display-material',
-      defines: {
-        ...ShaderLib.basic.defines,
-      },
       vertexColors: VertexColors,
       fragmentShader: ShaderLib.basic.fragmentShader
         .replace(
           '#include <common>',
           [
             'varying float vInstanceIsOn;',
-            '#ifdef USE_SEQUENCE',
-            'varying float vInstanceSequence;',
-            'uniform float sequence;',
-            '#endif',
             '#include <common>',
           ].join('\n')
         )
@@ -59,10 +52,6 @@ class Display extends InstancedMesh {
           'vec4 diffuseColor = vec4( diffuse, opacity );',
           [
             'vec3 albedo = vInstanceIsOn > 0.5 ? vec3(0.3) : vec3(0.03);',
-            '#ifdef USE_SEQUENCE',
-            'if (abs(vInstanceSequence - sequence) <= 0.5) { albedo.r = 0.3; }',
-            'if (vInstanceIsOn < 0.5 && mod(vInstanceSequence + 0.5, 8.0) <= 1.0) { albedo *= 0.5; }',
-            '#endif',
             'vec4 diffuseColor = vec4( diffuse * albedo, opacity );',
           ].join('\n')
         ),
@@ -72,10 +61,6 @@ class Display extends InstancedMesh {
           [
             'attribute float instanceIsOn;',
             'varying float vInstanceIsOn;',
-            '#ifdef USE_SEQUENCE',
-            'attribute float instanceSequence;',
-            'varying float vInstanceSequence;',
-            '#endif',
             '#include <common>',
           ].join('\n')
         )
@@ -84,9 +69,6 @@ class Display extends InstancedMesh {
           [
             '#include <begin_vertex>',
             'vInstanceIsOn = instanceIsOn;',
-            '#ifdef USE_SEQUENCE',
-            'vInstanceSequence = instanceSequence;',
-            '#endif',
           ].join('\n')
         ),
       uniforms: UniformsUtils.clone(ShaderLib.basic.uniforms),
@@ -163,11 +145,9 @@ class Display extends InstancedMesh {
   }
 
   update(state) {
-    const { geometry, resolution } = this;
+    const { geometry } = this;
     const instances = geometry.getAttribute('instanceIsOn');
-    state.forEach((row, y) => row.forEach((isOn, x) => {
-      instances.array[((resolution.y - 1 - y) * resolution.x) + x] = isOn ? 1 : 0;
-    }));
+    instances.array.set(state);
     instances.needsUpdate = true;
   }
 }
