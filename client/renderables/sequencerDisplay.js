@@ -29,7 +29,7 @@ class SequencerDisplay extends Display {
           'vec4 diffuseColor = vec4( diffuse * albedo, opacity );',
           [
             'if (abs(vInstanceSequence - sequence) <= 0.5) { albedo.r = 0.3; }',
-            'if (vInstanceIsOn < 0.5 && mod(vInstanceSequence + 0.5, 8.0) <= 1.0) { albedo *= 0.5; }',
+            'if (vInstanceIsOn < 0.5 && mod(vInstanceSequence + 0.5, 16.0) <= 1.0) { albedo *= 0.5; }',
             'vec4 diffuseColor = vec4( diffuse * albedo, opacity );',
           ].join('\n')
         ),
