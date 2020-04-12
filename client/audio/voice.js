@@ -1,7 +1,8 @@
 class Voice {
   constructor({
     context,
-    note,
+    gain = 0,
+    note = 0,
     octave,
     root,
     scale,
@@ -9,28 +10,52 @@ class Voice {
   }) {
     this.context = context;
     this.output = context.createGain();
-    this.output.gain.setValueAtTime(0, context.currentTime);
-    const intervals = Voice.scales[
-      Object.keys(Voice.scales)[scale]
-    ];
-    const num = intervals.length + 1;
-    const o = Math.floor(note / num);
-    const n = Math.floor(note % num);
-    note = ((octave + o) * 12) + root;
-    for (let i = 0; i < n; i += 1) {
-      note += intervals[i];
-    }
+    this.output.gain.setValueAtTime(gain, context.currentTime);
+
     this.oscillators = waves.map(({ type, offset }) => {
-      const frequency = Voice.frequencies[note + offset];
       const gain = context.createGain();
-      const oscillator = context.createOscillator();
       gain.gain.setValueAtTime((1 / waves.length) * 0.5, context.currentTime);
       gain.connect(this.output);
+      const oscillator = context.createOscillator();
+      oscillator.offset = offset;
       oscillator.type = type;
-      oscillator.frequency.setValueAtTime(frequency, context.currentTime);
       oscillator.connect(gain);
       oscillator.start(context.currentTime);
       return oscillator;
+    });
+
+    const { scales, roots } = Voice;
+    root = roots.indexOf(root);
+    scale = scales[scale];
+    this.notes = [];
+    for (let o = 0; o < 4; o += 1) {
+      let note = ((octave + o) * 12) + root;
+      this.notes.push(note);
+      scale.forEach((interval) => {
+        note += interval;
+        this.notes.push(note);
+      });
+    }
+
+    this.note = note;
+  }
+
+  get note() {
+    return this._note;
+  }
+
+  set note(value) {
+    const { context, notes, oscillators } = this;
+    if (this._note === value) {
+      return;
+    }
+    this._note = value;
+    oscillators.forEach(({ frequency, offset }) => {
+      frequency.cancelScheduledValues(0);
+      frequency.linearRampToValueAtTime(
+        Voice.frequencies[notes[value] + offset],
+        context.currentTime + 0.02
+      );
     });
   }
 
@@ -60,6 +85,7 @@ Voice.frequencies = (() => {
   return frequencies;
 })();
 
+Voice.roots = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 Voice.scales = {
   // Chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   Aeolian: [2, 1, 2, 2, 1, 2],

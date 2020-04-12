@@ -11,6 +11,7 @@ class Channel {
     if (filters) {
       this.filters = filters.map(({
         type,
+        amount,
         detune,
         frequency,
         gain,
@@ -19,7 +20,12 @@ class Channel {
         let filter;
         switch (type) {
           case 'analyser':
-            filter = this.createAnalyser();
+            filter = Channel.createAnalyser(context);
+            break;
+          case 'distortion':
+            filter = context.createWaveShaper();
+            filter.curve = Channel.getDistortionCurve(amount);
+            filter.oversample = '4x';
             break;
           default:
             filter = context.createBiquadFilter();
@@ -60,8 +66,11 @@ class Channel {
     return this._gain;
   }
 
-  set gain(gain) {
-    this._gain = gain;
+  set gain(value) {
+    if (this._gain === value) {
+      return;
+    }
+    this._gain = value;
     this.updateGain();
   }
 
@@ -70,16 +79,33 @@ class Channel {
   }
 
   set muted(value) {
+    if (this._muted === value) {
+      return;
+    }
     this._muted = value;
     this.updateGain();
   }
 
-  createAnalyser() {
-    const { context } = this;
+  updateGain() {
+    const {
+      context,
+      gain,
+      muted,
+      output,
+    } = this;
+    const target = muted ? 0 : gain;
+    output.gain.cancelScheduledValues(0);
+    output.gain.linearRampToValueAtTime(
+      target,
+      context.currentTime + 0.02
+    );
+  }
+
+  static createAnalyser(context) {
+    const { analyserBands: bands } = Channel;
     const analyser = context.createAnalyser();
     analyser.fftSize = 4096;
     const buffer = new Uint8Array(analyser.frequencyBinCount);
-    const bands = [2, 4, 8, 16, 32, 64, 128, 256, 512];
     const bins = new Uint8Array(8);
     analyser.getBands = () => {
       analyser.getByteFrequencyData(buffer);
@@ -100,20 +126,24 @@ class Channel {
     return analyser;
   }
 
-  updateGain() {
-    const {
-      context,
-      gain,
-      muted,
-      output,
-    } = this;
-    const target = muted ? 0 : gain;
-    output.gain.cancelScheduledValues(0);
-    output.gain.linearRampToValueAtTime(
-      target,
-      context.currentTime + 0.02
-    );
+  static getDistortionCurve(k) {
+    const { distortionCurves } = Channel;
+    let curve = distortionCurves.get(k);
+    if (!curve) {
+      const deg = Math.PI / 180;
+      const samples = 44100;
+      curve = new Float32Array(samples);
+      for (let i = 0; i < samples; i += 1) {
+        const j = (i * 2) / samples - 1;
+        curve[i] = ((3 + k) * j * 20 * deg) / (Math.PI + k * Math.abs(j));
+      }
+      distortionCurves.set(k, curve);
+    }
+    return curve;
   }
 }
+
+Channel.analyserBands = [2, 4, 8, 16, 32, 64, 128, 256, 512];
+Channel.distortionCurves = new Map();
 
 export default Channel;

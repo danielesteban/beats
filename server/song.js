@@ -1,10 +1,17 @@
 const Room = require('./room');
 
 class Song extends Room {
-  constructor({ bpm, tracks }) {
+  constructor({
+    bpm,
+    root,
+    scale,
+    tracks,
+  }) {
     super();
     const { pages, steps, voices } = Song;
     this.bpm = bpm;
+    this.root = root;
+    this.scale = scale;
     this.tracks = tracks;
     tracks.forEach((track) => {
       track.pages = [...Array(pages)].map(() => Buffer.alloc(voices[track.type] * steps));
@@ -13,9 +20,16 @@ class Song extends Room {
   }
 
   onInit() {
-    const { bpm, tracks } = this;
+    const {
+      bpm,
+      root,
+      scale,
+      tracks,
+    } = this;
     return {
       bpm,
+      root,
+      scale,
       tracks: tracks.map((track) => ({
         ...track,
         pages: track.pages.map((page) => page.toString('base64')),

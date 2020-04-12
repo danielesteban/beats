@@ -1,3 +1,4 @@
+import Channel from '../audio/channel.js';
 import Display from '../renderables/display.js';
 import Escher from '../renderables/escher.js';
 import { FogExp2, Object3D, Vector3 } from '../core/three.js';
@@ -7,6 +8,7 @@ import SequencerDisplay from '../renderables/sequencerDisplay.js';
 import Shadow from '../renderables/shadow.js';
 import Spectrum from '../renderables/spectrum.js';
 import Stand from '../renderables/stand.js';
+import Synths from '../audio/synths.js';
 import Translocable from '../renderables/translocable.js';
 import Wall from '../renderables/wall.js';
 
@@ -15,8 +17,10 @@ class Room extends Scene {
     super(renderer);
 
     this.auxVector = new Vector3();
-    this.displays = [];
     this.fog = new FogExp2(0, 0.03);
+
+    this.background = new Escher();
+    this.add(this.background);
 
     const floor = new Wall({ width: 20, height: 20, light: 0.6 });
     floor.rotation.set(Math.PI * -0.5, 0, 0);
@@ -26,10 +30,20 @@ class Room extends Scene {
     this.translocables.push(translocable);
     this.add(translocable);
 
-    this.background = new Escher();
-    this.add(this.background);
+    {
+      const listener = this.player.head;
+      this.audio = new Channel({
+        context: listener.context,
+        filters: [{ type: 'analyser' }],
+      });
+      const [analyser] = this.audio.filters;
+      this.audio.analyser = analyser;
+      this.audio.output.connect(listener.getInput());
+    }
 
-    this.sequencer = new Sequencer({ listener: this.player.head });
+    this.displays = [];
+    this.sequencer = new Sequencer(this.audio);
+    this.synths = new Synths(this.audio);
     this.spectrum = new Spectrum();
     this.add(this.spectrum);
 
@@ -43,11 +57,14 @@ class Room extends Scene {
   onBeforeRender(renderer, scene, camera) {
     super.onBeforeRender(renderer, scene, camera);
     const {
+      audio,
       background,
+      peers,
       player,
       sequencer,
       server,
       spectrum,
+      synths,
     } = this;
     SequencerDisplay.updateMaterial(sequencer);
     background.updateFrustum(camera);
@@ -109,7 +126,12 @@ class Room extends Scene {
     sequencer.step();
     spectrum.update({
       animation: renderer.animation,
-      bands: sequencer.main.analyser.getBands(),
+      bands: audio.analyser.getBands(),
+    });
+    synths.update({
+      clock: sequencer.clock,
+      peers: peers.peers,
+      player,
     });
   }
 
@@ -119,6 +141,12 @@ class Room extends Scene {
     switch (type) {
       case 'INIT':
         this.onInit(data);
+        break;
+      case 'JOIN':
+        this.synths.join(data);
+        break;
+      case 'LEAVE':
+        this.synths.leave(data);
         break;
       case 'PAGE': {
         const { sequencer } = this;
@@ -144,7 +172,7 @@ class Room extends Scene {
   }
 
   onInit(data) {
-    const { displays, sequencer } = this;
+    const { displays, sequencer, synths } = this;
     displays.length = 0;
     if (sequencer.tracks) {
       sequencer.tracks.forEach(({ display, machine }) => {
@@ -218,6 +246,7 @@ class Room extends Scene {
       sequencer.tracks[track].display = display;
       sequencer.tracks[track].machine = machine;
     });
+    synths.init(data);
   }
 
   getButtonAtPosition(position) {

@@ -3,24 +3,30 @@ import Sample from './sample.js';
 import Voice from './voice.js';
 
 class Sequencer {
-  constructor({ listener }) {
-    this.context = listener.context;
-    this.main = new Channel({
-      context: this.context,
-      filters: [{ type: 'analyser' }],
-    });
-    const [analyser] = this.main.filters;
-    this.main.analyser = analyser;
-    this.main.gain = 0.5;
-    this.main.output.connect(listener.getInput());
+  constructor({ context, input }) {
+    this.context = context;
+    this.main = new Channel({ context, gain: 0.5 });
+    this.main.output.connect(input);
     this.syncTimeOffset();
   }
 
-  init({ bpm, tracks }) {
+  init({
+    bpm,
+    root,
+    scale,
+    tracks,
+  }) {
+    const { context, main } = this;
     this.bpm = bpm;
+    this.spb = 60 / (bpm * 4);
     if (this.tracks) {
-      this.tracks.forEach(({ channel }) => {
-        channel.output.disconnect(this.main.input);
+      this.tracks.forEach(({ channel, voices }) => {
+        channel.output.disconnect(main.input);
+        voices.forEach(({ oscillators }) => {
+          if (oscillators) {
+            oscillators.forEach((oscillator) => oscillator.stop(context.currentTime));
+          }
+        });
       });
     }
     this.tracks = tracks.map(({
@@ -29,6 +35,8 @@ class Sequencer {
       pages,
       ...options
     }) => {
+      options.root = root;
+      options.scale = scale;
       let track;
       switch (type) {
         case 'sampler':
@@ -119,22 +127,22 @@ class Sequencer {
 
   step() {
     const {
-      bpm,
       context,
+      spb,
       tracks,
       timeOffset: offset,
     } = this;
     if (!tracks || offset === undefined) {
       return;
     }
-    const step = 60000 / (bpm * 4);
-    const sequence = Math.floor(((Date.now() + offset) / step) % 64);
+    this.clock = (Date.now() + offset) / 1000 / spb;
+    const sequence = Math.floor(this.clock % 64);
     if (this.sequence !== sequence) {
       this.sequence = sequence;
       if (context.state === 'running') {
         tracks.forEach(({ page, pages, voices }) => pages[page].forEach((page, voice) => {
           if (page[sequence]) {
-            voices[voice].trigger(step / 1000);
+            voices[voice].trigger(spb);
           }
         }));
       }
