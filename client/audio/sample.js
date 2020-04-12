@@ -30,7 +30,7 @@ class Sample {
         resolve(buffer);
         return;
       }
-      fetch(`/samples/${name}.${canPlayOgg ? 'ogg' : 'mp3'}`)
+      fetch(`/audio/samples/${name}.${canPlayOgg ? 'ogg' : 'mp3'}`)
         .then((res) => res.arrayBuffer())
         .then((encoded) => new Promise((resolve, reject) => (
           context.decodeAudioData(encoded, resolve, reject)
