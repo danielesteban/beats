@@ -55,7 +55,7 @@ class Synths {
       scale,
       waves: [
         { type: 'sine', offset: 0 },
-        { type: 'triangle', offset: 12 },
+        { type: 'triangle', offset: 7 },
       ],
     });
     voice.output.connect(channel.input);
