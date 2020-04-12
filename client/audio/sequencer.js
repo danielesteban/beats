@@ -4,6 +4,7 @@ import Voice from './voice.js';
 
 class Sequencer {
   constructor({ context, input }) {
+    this.clock = 0;
     this.context = context;
     this.main = new Channel({ context, gain: 0.5 });
     this.main.output.connect(input);
