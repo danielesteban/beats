@@ -44,14 +44,16 @@ class Room extends Scene {
     this.displays = [];
     this.sequencer = new Sequencer(this.audio);
     this.synths = new Synths(this.audio);
+    this.add(this.synths.meshes);
     this.spectrum = new Spectrum();
     this.add(this.spectrum);
 
-    this.player.position.set(
-      Math.floor(Math.random() * 4) - 1.5,
-      0,
-      Math.floor(Math.random() * 4) - 1.5
-    );
+    // this.player.position.set(
+    //   Math.floor(Math.random() * 4) - 1.5,
+    //   0,
+    //   Math.floor(Math.random() * 4) - 1.5
+    // );
+    // this.audio.muted = true;
   }
 
   onBeforeRender(renderer, scene, camera) {

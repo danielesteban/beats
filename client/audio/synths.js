@@ -1,4 +1,6 @@
 import Channel from './channel.js';
+import { Object3D } from '../core/three.js';
+import Synth from '../renderables/synth.js';
 import Voice from './voice.js';
 
 class Synths {
@@ -6,6 +8,7 @@ class Synths {
     this.context = context;
     this.main = new Channel({ context, gain: 0.5 });
     this.main.output.connect(input);
+    this.meshes = new Object3D();
     this.synths = new Map();
   }
 
@@ -28,6 +31,7 @@ class Synths {
     const {
       context,
       main,
+      meshes,
       root,
       scale,
       synths,
@@ -41,6 +45,8 @@ class Synths {
       gain: 0.5,
       muted: true,
     });
+    const mesh = new Synth();
+    meshes.add(mesh);
     const voice = new Voice({
       context,
       gain: 1,
@@ -56,18 +62,21 @@ class Synths {
     channel.output.connect(main.input);
     synths.set(id, {
       channel,
+      mesh,
       voice,
     });
   }
 
   leave(id) {
-    const { context, main, synths } = this;
-    const synth = synths.get(id);
-    if (!synth) {
-      return;
-    }
-    const { channel, voice } = synth;
+    const {
+      context,
+      main,
+      meshes,
+      synths,
+    } = this;
+    const { channel, mesh, voice } = synths.get(id);
     channel.output.disconnect(main.input);
+    meshes.remove(mesh);
     voice.oscillators.forEach((oscillator) => (
       oscillator.stop(context.currentTime)
     ));
@@ -79,9 +88,10 @@ class Synths {
       hands: player.controllers
         .filter(({ hand }) => (!!hand))
         .sort(({ hand: { handedness: a } }, { hand: { handedness: b } }) => b.localeCompare(a))
-        .map(({ buttons, worldspace: { position } }) => ({
+        .map(({ buttons, worldspace: { position, quaternion } }) => ({
           enabled: buttons.trigger,
           position,
+          quaternion,
         })),
       id: 'player',
     });
@@ -90,9 +100,10 @@ class Synths {
         clock,
         hands: controllers
           .filter(({ visible }) => (!!visible))
-          .map(({ hand, position }) => ({
+          .map(({ hand, position, quaternion }) => ({
             enabled: !!(hand.state & (1 << 1)),
             position,
+            quaternion,
           })),
         id: peer,
       })
@@ -118,11 +129,18 @@ class Synths {
       right.position.y - left.position.y
     ) * 4, 0), 1);
     const cutoff = (2 ** (1 + Math.floor(4 * distanceV)));
-    const { channel, voice } = synths.get(id);
-    channel.muted = !enabled || (Math.floor(clock * 8) % (cutoff * 2)) >= cutoff;
-    voice.note = Math.floor(
-      distanceH * (voice.notes.length - 16)
+    const { channel, mesh, voice } = synths.get(id);
+    const note = Math.floor(
+      distanceH * (voice.notes.length - 14)
     );
+    channel.muted = !enabled || (Math.floor(clock * 8) % (cutoff * 2)) >= cutoff;
+    mesh.update({
+      clock: (clock * 16) / cutoff,
+      enabled,
+      hands,
+      note,
+    });
+    voice.note = note;
   }
 }
 
