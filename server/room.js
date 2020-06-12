@@ -3,6 +3,7 @@ const { v4: uuid } = require('uuid');
 class Room {
   constructor() {
     this.clients = [];
+    this.maxClients = process.env.MAX_CLIENTS ? parseInt(process.env.MAX_CLIENTS, 10) : 16;
   }
 
   onClose(client) {
@@ -22,7 +23,15 @@ class Room {
   }
 
   onClient(client) {
-    const { clients, pingInterval } = this;
+    const { clients, maxClients, pingInterval } = this;
+    if (clients.length >= maxClients) {
+      client.send(JSON.stringify({
+        type: 'ERROR',
+        data: 'Server is full. Try again later.',
+      }), () => {});
+      client.terminate();
+      return;
+    }
     client.id = uuid();
     client.send(JSON.stringify({
       type: 'INIT',

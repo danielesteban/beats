@@ -82,6 +82,9 @@ class Scene extends ThreeScene {
   onEvent({ type, data }) {
     const { peers, server } = this;
     switch (type) {
+      case 'ERROR':
+        server.error = data;
+        break;
       case 'INIT':
         peers.init({
           server,
@@ -120,6 +123,13 @@ class Scene extends ThreeScene {
     const server = new WebSocket(url.toString());
     server.addEventListener('close', () => {
       peers.reset();
+      if (server.error) {
+        const dialog = document.createElement('div');
+        dialog.id = 'error';
+        dialog.innerText = server.error;
+        document.body.appendChild(dialog);
+        return;
+      }
       setTimeout(() => this.connect(), 1000);
     });
     server.addEventListener('error', () => {});
