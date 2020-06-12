@@ -1,2 +1,2 @@
 // eslint-disable-next-line import/no-unresolved
-export * from 'https://unpkg.com/three@0.115.0/build/three.module.js';
+export * from 'https://cdn.jsdelivr.net/npm/three@0.117.1/build/three.module.js';
