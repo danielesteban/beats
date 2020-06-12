@@ -1,5 +1,7 @@
 FROM node:erbium
 
+ENV NODE_ENV production
+
 # Create working directory
 RUN mkdir -p /usr/src/beats
 WORKDIR /usr/src/beats
@@ -7,7 +9,7 @@ WORKDIR /usr/src/beats
 # Install dependencies
 COPY package.json .
 COPY package-lock.json .
-RUN npm install
+RUN npm ci
 
 # Copy server & client
 COPY server/ server/
