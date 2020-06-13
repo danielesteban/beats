@@ -4,9 +4,6 @@
 
 > A virtual collaborative song
 
- * [Live demo](https://beats.gatunes.com/)
- * [Docker image](https://hub.docker.com/r/danigatunes/beats)
-
 #### docker-compose
 
 ```yaml
