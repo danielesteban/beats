@@ -1,7 +1,0 @@
-version: '3'
-services:
-  server:
-    image: danigatunes/beats:latest
-    restart: always
-    ports:
-     - "80:8080"
