@@ -11,14 +11,18 @@ const renderer = new Renderer({
 
 renderer.loadScene(Room);
 
+let active;
 const create = document.getElementById('create');
 const songs = document.getElementById('songs');
 
 const fetchSongs = () => fetch('/songs')
   .then((res) => res.json())
   .then((list) => {
+    if (!active) {
+      active = list[0].id;
+    }
     [...songs.getElementsByTagName('a')].forEach((a) => songs.removeChild(a));
-    list.forEach((song, i) => {
+    list.forEach((song) => {
       const a = document.createElement('a');
       const name = document.createElement('span');
       const peers = document.createElement('span');
@@ -27,13 +31,13 @@ const fetchSongs = () => fetch('/songs')
       peers.innerText = `${song.peers}`;
       a.appendChild(peers);
       a.addEventListener('click', () => {
-        if (a.className !== 'active') {
-          songs.getElementsByClassName('active')[0].className = '';
-          a.className = 'active';
+        if (song.id !== active) {
+          active = song.id;
           renderer.scene.connect(`/${song.id}`);
+          fetchSongs();
         }
       });
-      if (i === 0) {
+      if (song.id === active) {
         a.className = 'active';
       }
       songs.appendChild(a);
@@ -64,7 +68,12 @@ create.addEventListener('submit', (e) => {
     headers: { 'Content-Type': 'application/json' },
     method: 'PUT',
   })
-    .then(fetchSongs);
+    .then((res) => res.json())
+    .then((id) => {
+      active = id;
+      renderer.scene.connect(`/${id}`);
+      fetchSongs();
+    });
 });
 
 fetchSongs();

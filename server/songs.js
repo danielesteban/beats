@@ -76,7 +76,7 @@ class Songs {
     });
     cache.set(song.id, song);
     if (res) {
-      res.status(200).end();
+      res.json(song.id).end();
     }
     return song;
   }
