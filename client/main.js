@@ -32,8 +32,7 @@ const fetchSongs = () => fetch('/songs')
       a.addEventListener('click', () => {
         if (song.id !== active) {
           active = song.id;
-          renderer.scene.connect(`/${song.id}`);
-          fetchSongs();
+          renderer.scene.connect(`/${song.id}`, fetchSongs);
         }
       });
       if (song.id === active) {
@@ -63,8 +62,7 @@ create.addEventListener('submit', (e) => {
     .then((res) => res.json())
     .then((id) => {
       active = id;
-      renderer.scene.connect(`/${id}`);
-      fetchSongs();
+      renderer.scene.connect(`/${id}`, fetchSongs);
     });
 });
 

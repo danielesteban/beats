@@ -115,11 +115,12 @@ class Scene extends ThreeScene {
     this.onEvent(event);
   }
 
-  connect(pathname = '/') {
+  connect(pathname = '/', callback) {
     const { peers } = this;
     if (this.server) {
       this.server.onclose = null;
       this.server.onmessage = null;
+      this.server.onopen = null;
       this.server.close();
       if (this.reconnectTimer) {
         clearTimeout(this.reconnectTimer);
@@ -147,6 +148,9 @@ class Scene extends ThreeScene {
       this.reconnectTimer = setTimeout(() => this.connect(pathname), 1000);
     };
     server.onmessage = this.onMessage.bind(this);
+    if (callback) {
+      server.onopen = () => callback();
+    }
     this.server = server;
   }
 }
