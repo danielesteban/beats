@@ -2,6 +2,7 @@ const { v4: uuid } = require('uuid');
 
 class Room {
   constructor() {
+    this.id = uuid();
     this.clients = [];
     this.maxClients = process.env.MAX_CLIENTS ? parseInt(process.env.MAX_CLIENTS, 10) : 16;
   }

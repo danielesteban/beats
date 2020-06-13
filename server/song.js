@@ -3,6 +3,7 @@ const Room = require('./room');
 class Song extends Room {
   constructor({
     bpm,
+    name,
     root,
     scale,
     tracks,
@@ -10,6 +11,7 @@ class Song extends Room {
     super();
     const { pages, steps, voices } = Song;
     this.bpm = bpm;
+    this.name = name;
     this.root = root;
     this.scale = scale;
     this.tracks = tracks;
