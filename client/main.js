@@ -50,22 +50,14 @@ songs.getElementsByTagName('button')[0].addEventListener('click', () => {
 create.addEventListener('submit', (e) => {
   e.preventDefault();
   const {
-    name,
     bpm,
     root,
     scale,
   } = e.target;
-  if (
-    !name.value
-    || !bpm.value
-  ) {
-    return;
-  }
   create.className = '';
   fetch('/songs', {
     body: JSON.stringify({
       bpm: bpm.value,
-      name: name.value,
       root: root.value,
       scale: scale.value,
     }),

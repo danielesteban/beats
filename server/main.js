@@ -10,7 +10,6 @@ const songs = new Songs();
 const defaultSong = songs.create({
   body: {
     bpm: 100,
-    name: 'Default Song',
     root: 'D',
     scale: 'Mixolydian',
   },

@@ -1,3 +1,4 @@
+const namor = require('namor');
 const Song = require('./song');
 
 class Songs {
@@ -9,20 +10,16 @@ class Songs {
     const { AllowedRoots, AllowedScales } = Songs;
     let {
       bpm,
-      name,
       root,
       scale,
     } = req.body;
     bpm = parseInt(bpm, 10);
-    name = `${name}`;
     root = `${root}`;
     scale = `${scale}`;
     if (
       Number.isNaN(bpm)
       || bpm < 60
       || bpm > 240
-      || name.length < 3
-      || name.length > 25
       || AllowedRoots.indexOf(root) === -1
       || AllowedScales.indexOf(scale) === -1
     ) {
@@ -34,7 +31,7 @@ class Songs {
     const { cache } = this;
     const song = new Song({
       bpm,
-      name,
+      name: namor.generate({ words: 3, saltLength: 0 }),
       root,
       scale,
       tracks: [
