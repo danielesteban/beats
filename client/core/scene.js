@@ -129,6 +129,7 @@ class Scene extends ThreeScene {
       if (error) {
         error.parentNode.removeChild(error);
       }
+      peers.reset();
     }
     const url = new URL(window.location.toString());
     url.pathname = pathname;
