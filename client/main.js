@@ -8,7 +8,6 @@ const renderer = new Renderer({
   },
   mount: document.getElementById('mount'),
 });
-
 renderer.loadScene(Room);
 
 let active;
@@ -44,13 +43,6 @@ const fetchSongs = () => fetch('/songs')
     });
   });
 
-create.getElementsByTagName('button')[0].addEventListener('click', () => {
-  create.className = '';
-});
-songs.getElementsByTagName('button')[0].addEventListener('click', () => {
-  create.className = 'open';
-});
-
 create.addEventListener('submit', (e) => {
   e.preventDefault();
   const {
@@ -76,4 +68,13 @@ create.addEventListener('submit', (e) => {
     });
 });
 
+create.getElementsByTagName('button')[0].addEventListener('click', () => {
+  create.className = '';
+});
+songs.getElementsByTagName('button')[0].addEventListener('click', () => {
+  create.className = 'open';
+});
+[...create.getElementsByTagName('select')].forEach((select) => {
+  select.value = select.options[Math.floor(Math.random() * select.options.length)].value;
+});
 fetchSongs();

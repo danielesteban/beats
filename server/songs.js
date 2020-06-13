@@ -122,7 +122,7 @@ Songs.AllowedScales = [
   'Lydian raised fifth',
   'Major minor',
   'Altered',
-  'Arabic',
+  'Eastern',
 ];
 
 module.exports = Songs;

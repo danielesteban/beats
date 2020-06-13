@@ -100,7 +100,7 @@ Voice.scales = {
   'Lydian raised fifth': [2, 2, 2, 2, 1, 2],
   'Major minor': [2, 2, 1, 2, 1, 2],
   Altered: [1, 2, 1, 2, 2, 2],
-  Arabic: [1, 2, 2, 2, 1, 3],
+  Eastern: [1, 2, 2, 2, 1, 3],
 };
 
 export default Voice;
