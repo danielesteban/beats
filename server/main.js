@@ -25,12 +25,12 @@ for (let i = 0; i < 16; i += 1) {
 
 const server = express();
 server.use(helmet());
-server.use(express.static(path.join(__dirname, '..', 'client')));
-expressWS(server, null, { clientTracking: false, perMessageDeflate: true });
+expressWS(server, null, { clientTracking: false });
 server.ws('/', songs.get.bind(songs));
 server.ws('/:song', songs.get.bind(songs));
 server.get('/songs', songs.list.bind(songs));
 server.put('/songs', songs.create.bind(songs));
 server.get('/sync', (req, res) => res.end(`${Date.now()}`));
+server.use(express.static(path.join(__dirname, '..', 'client')));
 server.use((req, res) => res.status(404).end());
 server.listen(process.env.PORT || 8080);
