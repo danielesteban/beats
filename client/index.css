@@ -84,7 +84,7 @@ canvas {
 }
 
 #mount {
-  width: calc(100vw - 300px);
+  width: calc(100vw - 250px);
   height: 100vh;
 }
 
@@ -92,7 +92,7 @@ canvas {
   position: relative;
   background: #1A1A1A;
   float: right;
-  width: 300px;
+  width: 250px;
   height: 100vh;
   overflow-y: overlay;
 }
@@ -115,7 +115,7 @@ canvas {
 
 #songs > a > span:first-child {
   box-sizing: border-box;
-  width: 250px;
+  width: 200px;
   padding-left: 1rem;
   white-space: nowrap;
   text-overflow: ellipsis;
