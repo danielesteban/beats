@@ -23,19 +23,127 @@ canvas {
   color: inherit;
 }
 
-#error {
+#create, #error {
   position: absolute;
-  background: rgba(0, 0, 0, .5);
-  padding: 3rem;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  box-sizing: border-box;
+}
+
+#create {
+  display: none;
+  width: 400px;
+  background: #222;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+}
+
+#create.open {
+  display: block;
+}
+
+#create > div {
+  padding: 1rem 2rem 0.5rem;
+}
+
+#create > div > label {
+  display: inline-block;
+  width: 100px;
+}
+
+#create > div > input, #create > div > select {
+  display: inline-block;
+  width: 220px;
+  outline: 0;
+}
+
+#create .submit {
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+#create .submit > button {
+  background: #333;
+  color: #fff;
+  margin: 0;
+  padding: 0.5rem;
+  border: 0;
+  outline: 0;
+  border-radius: 4px;
+  width: 100px;
+}
+
+#create .submit > button:last-child {
+  width: 200px;
+  background: #393;
+}
+
+#error {
+  background: rgba(0, 0, 0, .5);
+  padding: 3rem;
   opacity: 0.3;
 }
 
 #mount {
-  width: 100vw;
+  width: calc(100vw - 300px);
   height: 100vh;
+}
+
+#songs {
+  position: relative;
+  background: #1A1A1A;
+  float: right;
+  width: 300px;
+  height: 100vh;
+  overflow-y: overlay;
+}
+
+#songs > a {
+  display: block;
+  border-bottom: 1px solid #000;
+  cursor: pointer;
+}
+
+#songs > a.active {
+  background: #393;
+  cursor: default;
+}
+
+#songs > a > span {
+  display: inline-block;
+  padding: 1rem 0;
+}
+
+#songs > a > span:first-child {
+  box-sizing: border-box;
+  width: 250px;
+  padding-left: 1rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#songs > a > span:last-child {
+  float: right;
+  width: 50px;
+  text-align: center;
+}
+
+#songs > button {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  background: #393;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
 }
 
 #support.supported {
@@ -44,4 +152,23 @@ canvas {
 
 #support.unsupported {
   color: #f33;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+
+::-webkit-scrollbar-thumb:vertical {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:vertical:active {
+  background: rgba(255, 255, 255, 0.61);
+  border-radius: 100px;
 }

@@ -1,3 +1,4 @@
+const bodyParser = require('body-parser');
 const express = require('express');
 const expressWS = require('express-ws');
 const helmet = require('helmet');
@@ -29,7 +30,7 @@ expressWS(server, null, { clientTracking: false });
 server.ws('/', songs.get.bind(songs));
 server.ws('/:song', songs.get.bind(songs));
 server.get('/songs', songs.list.bind(songs));
-server.put('/songs', songs.create.bind(songs));
+server.put('/songs', bodyParser.json(), songs.create.bind(songs));
 server.get('/sync', (req, res) => res.end(`${Date.now()}`));
 server.use(express.static(path.join(__dirname, '..', 'client')));
 server.use((req, res) => res.status(404).end());

@@ -79,14 +79,18 @@ class Songs {
     });
     cache.set(song.id, song);
     if (res) {
-      res.json({ id: song.id, name: song.name });
+      res.status(200).end();
     }
     return song;
   }
 
   list(req, res) {
     const { cache } = this;
-    res.json([...cache.values()].map(({ id, name }) => ({ id, name })));
+    res.json([...cache.values()].map(({ id, clients, name }) => ({
+      id,
+      name,
+      peers: clients.length,
+    })));
   }
 
   get(client, req) {

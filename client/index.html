@@ -8,11 +8,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
   </head>
   <body>
+    <div id="songs">
+      <button>+</button>
+    </div>
     <div id="mount"></div>
     <div id="credits">
       beats - <span id="fps">···</span><br />
       <span id="support">···</span><br />
       <a href="https://dani.gatunes.com" rel="noopener noreferrer" target="_blank">dani@gatunes</a> © 2020
     </div>
+    <form id="create">
+      <div>
+        <label>Name:</label>
+        <input name="name" type="text" required />
+      </div>
+      <div>
+        <label>BPM:</label>
+        <input name="bpm" type="number" min="60" max="240" value="120" required />
+      </div>
+      <div>
+        <label>Root:</label>
+        <select name="root">
+          <option>C</option>
+          <option>C#</option>
+          <option>D</option>
+          <option>D#</option>
+          <option>E</option>
+          <option>F</option>
+          <option>F#</option>
+          <option>G</option>
+          <option>G#</option>
+          <option>A</option>
+          <option>A#</option>
+          <option>B</option>
+        </select>
+      </div>
+      <div>
+        <label>Scale:</label>
+        <select name="scale">
+          <option>Aeolian</option>
+          <option>Locrian</option>
+          <option>Ionian</option>
+          <option>Dorian</option>
+          <option>Phrygian</option>
+          <option>Lydian</option>
+          <option>Mixolydian</option>
+          <option>Melodic ascending minor</option>
+          <option>Phrygian raised sixth</option>
+          <option>Lydian raised fifth</option>
+          <option>Major minor</option>
+          <option>Altered</option>
+          <option>Arabic</option>
+        </select>
+      </div>
+      <div class="submit">
+        <button type="button">
+          Cancel
+        </button>
+        <button type="submit">
+          Create
+        </button>
+      </div>
+    </form>
   </body>
 </html>

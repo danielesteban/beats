@@ -115,13 +115,23 @@ class Scene extends ThreeScene {
     this.onEvent(event);
   }
 
-  connect() {
+  connect(pathname = '/') {
     const { peers } = this;
-    const url = new URL(window.location);
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
+    if (this.server) {
+      this.server.onclose = null;
+      this.server.onmessage = null;
+      this.server.close();
+    }
+    const url = new URL(window.location.toString());
+    url.pathname = pathname;
     url.protocol = url.protocol.replace(/http/, 'ws');
     url.hash = '';
     const server = new WebSocket(url.toString());
-    server.addEventListener('close', () => {
+    server.onerror = () => {};
+    server.onclose = () => {
       peers.reset();
       if (server.error) {
         const dialog = document.createElement('div');
@@ -130,10 +140,9 @@ class Scene extends ThreeScene {
         document.body.appendChild(dialog);
         return;
       }
-      setTimeout(() => this.connect(), 1000);
-    });
-    server.addEventListener('error', () => {});
-    server.addEventListener('message', this.onMessage.bind(this));
+      this.reconnectTimer = setTimeout(() => this.connect(pathname), 1000);
+    };
+    server.onmessage = this.onMessage.bind(this);
     this.server = server;
   }
 }
