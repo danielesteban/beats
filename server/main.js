@@ -6,20 +6,20 @@ const Songs = require('./songs');
 
 const songs = new Songs();
 
-const defaultRoom = songs.create({
+const defaultSong = songs.create({
   body: {
     bpm: 100,
-    name: 'Default Room',
+    name: 'Default Song',
     root: 'D',
     scale: 'Mixolydian',
   },
 });
 // 4 on the floor
 for (let i = 0; i < 16; i += 1) {
-  defaultRoom.tracks[0].pages[0][i * 4] = 1;
-  defaultRoom.tracks[0].pages[0][130 + i * 4] = 1;
+  defaultSong.tracks[0].pages[0][i * 4] = 1;
+  defaultSong.tracks[0].pages[0][130 + i * 4] = 1;
   if (i % 2 === 0) {
-    defaultRoom.tracks[0].pages[0][68 + i * 4] = 1;
+    defaultSong.tracks[0].pages[0][68 + i * 4] = 1;
   }
 }
 
