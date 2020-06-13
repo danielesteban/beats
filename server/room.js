@@ -28,7 +28,7 @@ class Room {
     if (clients.length >= maxClients) {
       client.send(JSON.stringify({
         type: 'ERROR',
-        data: 'Server is full. Try again later.',
+        data: 'Room is full. Try another room.',
       }), () => {});
       client.terminate();
       return;

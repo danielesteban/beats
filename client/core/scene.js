@@ -117,13 +117,17 @@ class Scene extends ThreeScene {
 
   connect(pathname = '/') {
     const { peers } = this;
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-    }
     if (this.server) {
       this.server.onclose = null;
       this.server.onmessage = null;
       this.server.close();
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer);
+      }
+      const error = document.getElementById('error');
+      if (error) {
+        error.parentNode.removeChild(error);
+      }
     }
     const url = new URL(window.location.toString());
     url.pathname = pathname;

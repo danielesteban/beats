@@ -81,7 +81,6 @@ canvas {
 #error {
   background: rgba(0, 0, 0, .5);
   padding: 3rem;
-  opacity: 0.3;
 }
 
 #mount {
