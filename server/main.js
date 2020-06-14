@@ -9,6 +9,7 @@ const songs = new Songs();
 
 const defaultSong = songs.create({
   body: {
+    bars: 4,
     bpm: 100,
     root: 'D',
     scale: 'Mixolydian',

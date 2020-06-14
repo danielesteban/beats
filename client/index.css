@@ -36,6 +36,7 @@ canvas {
   width: 400px;
   background: #222;
   box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+  border-radius: 4px;
 }
 
 #create.open {
@@ -51,10 +52,42 @@ canvas {
   width: 100px;
 }
 
-#create > div > input, #create > div > select {
+#create > div > input, #create > div > select, #bars {
   display: inline-block;
+  vertical-align: middle;
   width: 220px;
   outline: 0;
+}
+
+#bars {
+  text-align: center;
+  overflow: hidden;
+}
+
+#bars > div {
+  box-sizing: border-box;
+  float: left;
+  background: #333;
+  color: #fff;
+  margin: 0;
+  padding: 0.5rem;
+  border: 0;
+  outline: 0;
+  width: 100px;
+  cursor: pointer;
+}
+
+#bars > div:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+#bars > div:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+#bars > div.active {
+  background: #393;
+  cursor: default;
 }
 
 #create .submit {
@@ -63,6 +96,7 @@ canvas {
 }
 
 #create .submit > button {
+  box-sizing: border-box;
   background: #333;
   color: #fff;
   margin: 0;

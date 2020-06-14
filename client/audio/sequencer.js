@@ -15,6 +15,7 @@ class Sequencer {
     bpm,
     root,
     scale,
+    steps,
     tracks,
   }) {
     const { context, main } = this;
@@ -30,6 +31,7 @@ class Sequencer {
         });
       });
     }
+    this.steps = steps;
     this.tracks = tracks.map(({
       type,
       page,
@@ -55,8 +57,8 @@ class Sequencer {
         pages: pages.map((page) => {
           page = atob(page);
           return [...Array(track.voices.length)]
-            .map((v, y) => new Uint8Array([...Array(64)].map((v, x) => (
-              page.charCodeAt((y * 64) + x)
+            .map((v, y) => new Uint8Array([...Array(steps)].map((v, x) => (
+              page.charCodeAt((y * steps) + x)
             ))));
         }),
       };
@@ -130,6 +132,7 @@ class Sequencer {
     const {
       context,
       spb,
+      steps,
       tracks,
       timeOffset: offset,
     } = this;
@@ -137,7 +140,7 @@ class Sequencer {
       return;
     }
     this.clock = (Date.now() + offset) / 1000 / spb;
-    const sequence = Math.floor(this.clock % 64);
+    const sequence = Math.floor(this.clock % steps);
     if (this.sequence !== sequence) {
       this.sequence = sequence;
       if (context.state === 'running') {

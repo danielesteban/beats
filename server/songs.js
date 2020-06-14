@@ -9,15 +9,19 @@ class Songs {
   create(req, res) {
     const { AllowedRoots, AllowedScales } = Songs;
     let {
+      bars,
       bpm,
       root,
       scale,
     } = req.body;
+    bars = parseInt(bars, 10);
     bpm = parseInt(bpm, 10);
     root = `${root}`;
     scale = `${scale}`;
     if (
-      Number.isNaN(bpm)
+      Number.isNaN(bars)
+      || (bars !== 2 && bars !== 4)
+      || Number.isNaN(bpm)
       || bpm < 60
       || bpm > 240
       || AllowedRoots.indexOf(root) === -1
@@ -30,6 +34,7 @@ class Songs {
     }
     const { cache } = this;
     const song = new Song({
+      bars,
       bpm,
       name: namor.generate({ words: 3, saltLength: 0 }),
       root,

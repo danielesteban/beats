@@ -2,6 +2,7 @@ const Room = require('./room');
 
 class Song extends Room {
   constructor({
+    bars,
     bpm,
     name,
     root,
@@ -9,14 +10,15 @@ class Song extends Room {
     tracks,
   }) {
     super();
-    const { pages, steps, voices } = Song;
+    const { pages, voices } = Song;
     this.bpm = bpm;
     this.name = name;
     this.root = root;
     this.scale = scale;
+    this.steps = bars * 16;
     this.tracks = tracks;
     tracks.forEach((track) => {
-      track.pages = [...Array(pages)].map(() => Buffer.alloc(voices[track.type] * steps));
+      track.pages = [...Array(pages)].map(() => Buffer.alloc(voices[track.type] * this.steps));
       track.page = 0;
     });
   }
@@ -26,12 +28,14 @@ class Song extends Room {
       bpm,
       root,
       scale,
+      steps,
       tracks,
     } = this;
     return {
       bpm,
       root,
       scale,
+      steps,
       tracks: tracks.map((track) => ({
         ...track,
         pages: track.pages.map((page) => page.toString('base64')),
@@ -41,7 +45,7 @@ class Song extends Room {
 
   onRequest(client, request) {
     super.onRequest(client, request);
-    const { tracks } = this;
+    const { steps, tracks } = this;
     switch (request.type) {
       case 'SET': {
         let {
@@ -65,7 +69,7 @@ class Song extends Room {
         if (
           Number.isNaN(x)
           || x < 0
-          || x >= Song.steps
+          || x >= steps
           || Number.isNaN(y)
           || y < 0
           || y >= Song.voices[type]
@@ -75,7 +79,7 @@ class Song extends Room {
         ) {
           return;
         }
-        pages[page][(y * Song.steps) + x] = isOn;
+        pages[page][(y * steps) + x] = isOn;
         this.broadcast({
           type: 'SET',
           data: {

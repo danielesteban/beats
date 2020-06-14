@@ -45,6 +45,7 @@ const fetchSongs = () => fetch('/songs')
 create.addEventListener('submit', (e) => {
   e.preventDefault();
   const {
+    bars,
     bpm,
     root,
     scale,
@@ -52,6 +53,7 @@ create.addEventListener('submit', (e) => {
   create.className = '';
   fetch('/songs', {
     body: JSON.stringify({
+      bars: bars.value,
       bpm: bpm.value,
       root: root.value,
       scale: scale.value,
@@ -66,6 +68,16 @@ create.addEventListener('submit', (e) => {
     });
 });
 
+const bars = [...document.getElementById('bars').getElementsByTagName('div')];
+bars.forEach((button) => (
+  button.addEventListener('click', () => {
+    bars.forEach((button) => {
+      button.className = '';
+    });
+    button.className = 'active';
+    create.bars.value = button.innerText;
+  })
+));
 create.getElementsByTagName('button')[0].addEventListener('click', () => {
   create.className = '';
 });
