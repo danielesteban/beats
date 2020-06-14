@@ -12,6 +12,7 @@ class Song extends Room {
     super();
     const { pages, voices } = Song;
     this.bpm = bpm;
+    this.color = Math.floor(Math.random() * 0x100);
     this.name = name;
     this.root = root;
     this.scale = scale;
@@ -26,6 +27,7 @@ class Song extends Room {
   onInit() {
     const {
       bpm,
+      color,
       root,
       scale,
       steps,
@@ -33,6 +35,7 @@ class Song extends Room {
     } = this;
     return {
       bpm,
+      color,
       root,
       scale,
       steps,

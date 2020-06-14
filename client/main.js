@@ -1,5 +1,5 @@
 import Renderer from './core/renderer.js';
-import Room from './scenes/room.js';
+import Song from './scenes/song.js';
 
 const renderer = new Renderer({
   debug: {
@@ -8,7 +8,7 @@ const renderer = new Renderer({
   },
   mount: document.getElementById('mount'),
 });
-renderer.loadScene(Room);
+renderer.loadScene(Song);
 
 let active;
 const create = document.getElementById('create');

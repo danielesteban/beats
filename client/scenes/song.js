@@ -1,7 +1,12 @@
 import Channel from '../audio/channel.js';
 import Display from '../renderables/display.js';
 import Escher from '../renderables/escher.js';
-import { FogExp2, Object3D, Vector3 } from '../core/three.js';
+import {
+  Color,
+  FogExp2,
+  Object3D,
+  Vector3,
+} from '../core/three.js';
 import Scene from '../core/scene.js';
 import Sequencer from '../audio/sequencer.js';
 import SequencerDisplay from '../renderables/sequencerDisplay.js';
@@ -12,15 +17,15 @@ import Synths from '../audio/synths.js';
 import Translocable from '../renderables/translocable.js';
 import Wall from '../renderables/wall.js';
 
-class Room extends Scene {
+class Song extends Scene {
   constructor(renderer) {
     super(renderer);
 
     this.auxVector = new Vector3();
+    this.background = new Color(0);
     this.fog = new FogExp2(0, 0.03);
-
-    this.background = new Escher();
-    this.add(this.background);
+    this.scenery = new Escher();
+    this.add(this.scenery);
 
     const floor = new Wall({ width: 20, height: 20, light: 0.6 });
     floor.rotation.set(Math.PI * -0.5, 0, 0);
@@ -59,16 +64,16 @@ class Room extends Scene {
     super.onBeforeRender(renderer, scene, camera);
     const {
       audio,
-      background,
       peers,
       player,
+      scenery,
       sequencer,
       server,
       spectrum,
       synths,
     } = this;
     SequencerDisplay.updateMaterial(sequencer);
-    background.updateFrustum(camera);
+    scenery.updateFrustum(camera);
     player.controllers.forEach((controller) => {
       const {
         hand,
@@ -173,7 +178,15 @@ class Room extends Scene {
   }
 
   onInit(data) {
-    const { displays, sequencer, synths } = this;
+    const {
+      background,
+      displays,
+      fog,
+      sequencer,
+      synths,
+    } = this;
+    background.setHSL(data.color / 0xFF, 0.5, 0.15);
+    fog.color.copy(background);
     displays.length = 0;
     if (sequencer.tracks) {
       sequencer.tracks.forEach(({ display, machine }) => {
@@ -271,4 +284,4 @@ class Room extends Scene {
   }
 }
 
-export default Room;
+export default Song;
