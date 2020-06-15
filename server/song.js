@@ -7,21 +7,27 @@ class Song extends Room {
     name,
     root,
     scale,
-    tracks,
+    pages,
   }) {
     super();
-    const { pages, voices } = Song;
+    const { tracks, voices } = Song;
+    this.bars = bars;
     this.bpm = bpm;
     this.color = Math.floor(Math.random() * 0x100);
     this.name = name;
     this.root = root;
     this.scale = scale;
     this.steps = bars * 16;
-    this.tracks = tracks;
-    tracks.forEach((track) => {
-      track.pages = [...Array(pages)].map(() => Buffer.alloc(voices[track.type] * this.steps));
-      track.page = 0;
-    });
+    this.tracks = tracks.map((track, i) => ({
+      ...track,
+      pages: !pages ? (
+        [...Array(Song.pages)].map(() => Buffer.alloc(voices[track.type] * this.steps))
+      ) : (
+        pages[i].map((page) => Buffer.from(page, 'base64'))
+      ),
+      page: 0,
+    }));
+    this.needsPersistence = !pages;
   }
 
   onInit() {
@@ -83,6 +89,7 @@ class Song extends Room {
           return;
         }
         pages[page][(y * steps) + x] = isOn;
+        this.needsPersistence = true;
         this.broadcast({
           type: 'SET',
           data: {
@@ -133,6 +140,45 @@ class Song extends Room {
 
 Song.pages = 4;
 Song.steps = 64;
+Song.tracks = [
+  {
+    type: 'sampler',
+    gain: 0.5,
+  },
+  {
+    type: 'synth',
+    filters: [
+      {
+        type: 'lowpass',
+        frequency: 2048,
+      },
+    ],
+    gain: 0.5,
+    octave: 1,
+    waves: [
+      // Root + double fifth
+      { type: 'sine', offset: 0 },
+      { type: 'sawtooth', offset: 7 },
+      { type: 'square', offset: 14 },
+    ],
+  },
+  {
+    type: 'synth',
+    filters: [
+      {
+        type: 'highpass',
+        frequency: 1024,
+      },
+    ],
+    gain: 0.5,
+    octave: 2,
+    waves: [
+      // Lead
+      { type: 'sine', offset: 0 },
+      { type: 'square', offset: 14 },
+    ],
+  },
+];
 Song.voices = {
   sampler: 4,
   synth: 8,

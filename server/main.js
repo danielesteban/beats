@@ -5,22 +5,26 @@ const helmet = require('helmet');
 const path = require('path');
 const Songs = require('./songs');
 
-const songs = new Songs();
-
-const defaultSong = songs.create({
-  body: {
-    bars: 4,
-    bpm: 100,
-    root: 'D',
-    scale: 'Mixolydian',
-  },
+const songs = new Songs({
+  storage: process.env.STORAGE,
 });
-// 4 on the floor
-for (let i = 0; i < 16; i += 1) {
-  defaultSong.tracks[0].pages[0][i * 4] = 1;
-  defaultSong.tracks[0].pages[0][130 + i * 4] = 1;
-  if (i % 2 === 0) {
-    defaultSong.tracks[0].pages[0][68 + i * 4] = 1;
+
+if (!songs.cache.size) {
+  const defaultSong = songs.create({
+    body: {
+      bars: 4,
+      bpm: 100,
+      root: 'D',
+      scale: 'Mixolydian',
+    },
+  });
+  // 4 on the floor
+  for (let i = 0; i < 16; i += 1) {
+    defaultSong.tracks[0].pages[0][i * 4] = 1;
+    defaultSong.tracks[0].pages[0][130 + i * 4] = 1;
+    if (i % 2 === 0) {
+      defaultSong.tracks[0].pages[0][68 + i * 4] = 1;
+    }
   }
 }
 

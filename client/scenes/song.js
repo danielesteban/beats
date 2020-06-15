@@ -185,7 +185,17 @@ class Song extends Scene {
       sequencer,
       synths,
     } = this;
-    background.setHSL(data.color / 0xFF, 0.5, 0.15);
+    let color;
+    if (data.color < 85) {
+      color = [data.color * 3, 255 - data.color * 3, 0];
+    } else if (data.color < 170) {
+      data.color -= 85;
+      color = [255 - data.color * 3, 0, data.color * 3];
+    } else {
+      data.color -= 170;
+      color = [0, data.color * 3, 255 - data.color * 3];
+    }
+    background.setRGB(...color.map((c) => (c / 512)));
     fog.color.copy(background);
     displays.length = 0;
     if (sequencer.tracks) {

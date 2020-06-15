@@ -1,9 +1,19 @@
+const fs = require('fs');
+const path = require('path');
 const namor = require('namor');
 const Song = require('./song');
 
 class Songs {
-  constructor() {
+  constructor({ storage }) {
     this.cache = new Map();
+    this.storage = storage;
+    if (storage) {
+      if (!fs.existsSync(storage)) {
+        fs.mkdirSync(storage, { recursive: true });
+      }
+      this.load();
+      setInterval(() => this.persist(), 60000);
+    }
   }
 
   create(req, res) {
@@ -39,45 +49,6 @@ class Songs {
       name: namor.generate({ words: 3, saltLength: 0 }),
       root,
       scale,
-      tracks: [
-        {
-          type: 'sampler',
-          gain: 0.5,
-        },
-        {
-          type: 'synth',
-          filters: [
-            {
-              type: 'lowpass',
-              frequency: 2048,
-            },
-          ],
-          gain: 0.5,
-          octave: 1,
-          waves: [
-            // Root + double fifth
-            { type: 'sine', offset: 0 },
-            { type: 'sawtooth', offset: 7 },
-            { type: 'square', offset: 14 },
-          ],
-        },
-        {
-          type: 'synth',
-          filters: [
-            {
-              type: 'highpass',
-              frequency: 1024,
-            },
-          ],
-          gain: 0.5,
-          octave: 2,
-          waves: [
-            // Lead
-            { type: 'sine', offset: 0 },
-            { type: 'square', offset: 14 },
-          ],
-        },
-      ],
     });
     cache.set(song.id, song);
     if (res) {
@@ -86,18 +57,9 @@ class Songs {
     return song;
   }
 
-  list(req, res) {
-    const { cache } = this;
-    res.json([...cache.values()].map(({ id, clients, name }) => ({
-      id,
-      name,
-      peers: clients.length,
-    })));
-  }
-
   get(client, req) {
     const { cache } = this;
-    const song = cache.get(req.params.song ? `${req.params.song}` : cache.entries().next().value[0]);
+    const song = cache.get(req.params.song ? `${req.params.song}` : [...cache.keys()].reverse()[0]);
     if (!song) {
       client.send(JSON.stringify({
         type: 'ERROR',
@@ -107,6 +69,71 @@ class Songs {
       return;
     }
     song.onClient(client);
+  }
+
+  list(req, res) {
+    const { cache } = this;
+    res.json([...cache.values()].reverse().map(({ id, clients, name }) => ({
+      id,
+      name,
+      peers: clients.length,
+    })));
+  }
+
+  load() {
+    const { cache, storage } = this;
+    let stored;
+    try {
+      stored = JSON.parse(fs.readFileSync(path.join(storage, 'songs.json')));
+    } catch (e) {
+      return;
+    }
+    stored.forEach(({
+      bars,
+      bpm,
+      name,
+      root,
+      scale,
+      tracks,
+    }) => {
+      const song = new Song({
+        bars,
+        bpm,
+        name,
+        root,
+        scale,
+        pages: tracks,
+      });
+      cache.set(song.id, song);
+    });
+  }
+
+  persist() {
+    const { cache, storage } = this;
+    const songs = [...cache.values()];
+    if (!songs.reduce((persist, { needsPersistence }) => (
+      persist || needsPersistence
+    ), false)) {
+      return;
+    }
+    console.log('persisted!');
+    fs.writeFileSync(path.join(storage, 'songs.json'), JSON.stringify(songs.map(({
+      bars,
+      bpm,
+      name,
+      root,
+      scale,
+      tracks,
+    }) => ({
+      bars,
+      bpm,
+      name,
+      root,
+      scale,
+      tracks: tracks.map((track) => (
+        track.pages.map((page) => page.toString('base64'))
+      )),
+    }))));
   }
 }
 

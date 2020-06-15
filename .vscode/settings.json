@@ -4,12 +4,14 @@
   "search.exclude": {
     ".eslintcache": true,
     ".vscode/": true,
+    "data/": true,
     "node_modules/": true,
     "package-lock.json": true
   },
   "files.exclude": {
     ".eslintcache": true,
     ".vscode/": true,
+    "data/": true,
     "node_modules/": true,
     "package-lock.json": true
   }
