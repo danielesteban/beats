@@ -23,14 +23,14 @@ class Scene extends ThreeScene {
     this.connect();
   }
 
-  onBeforeRender({ animation: { delta }, xr }, scene, camera) {
+  onAnimationTick({ animation, camera, xr }) {
     const {
       peers,
       player,
       translocables,
     } = this;
-    player.onAnimationTick({ delta, camera });
-    peers.onAnimationTick({ delta, player });
+    player.onAnimationTick({ animation, camera });
+    peers.onAnimationTick({ animation, player });
     player.controllers.forEach((controller) => {
       const {
         buttons: {

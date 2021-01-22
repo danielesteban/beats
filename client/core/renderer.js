@@ -77,23 +77,31 @@ class Renderer {
       scene,
     } = this;
 
-    // Store the frame timings into the renderer
-    // So that they are accesible from onBeforeRender
-    renderer.animation = {
+    const animation = {
       delta: Math.min(clock.getDelta(), 1 / 30),
       time: clock.oldTime / 1000,
     };
 
     // Render scene
     if (scene) {
+      scene.player.updateMatrixWorld();
+      scene.onAnimationTick({
+        animation,
+        camera: renderer.xr.enabled && renderer.xr.isPresenting ? (
+          renderer.xr.getCamera(camera)
+        ) : (
+          camera
+        ),
+        xr: renderer.xr,
+      });
       renderer.render(scene, camera);
     }
 
     // Output debug info
     fps.count += 1;
-    if (renderer.animation.time >= fps.lastTick + 1) {
-      renderer.fps = Math.round(fps.count / (renderer.animation.time - fps.lastTick));
-      fps.lastTick = renderer.animation.time;
+    if (animation.time >= fps.lastTick + 1) {
+      renderer.fps = Math.round(fps.count / (animation.time - fps.lastTick));
+      fps.lastTick = animation.time;
       fps.count = 0;
       if (!renderer.xr.isPresenting) {
         debug.fps.innerText = `${renderer.fps}fps`;
@@ -131,7 +139,7 @@ class Renderer {
 
 // Tweak ThreeJS Fog
 ShaderChunk.fog_vertex = ShaderChunk.fog_vertex.replace(
-  'fogDepth = -mvPosition.z;',
+  'fogDepth = - mvPosition.z;',
   'fogDepth = length(mvPosition);'
 );
 

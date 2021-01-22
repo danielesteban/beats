@@ -65,7 +65,7 @@ class Player extends Object3D {
     });
   }
 
-  onAnimationTick({ delta, camera }) {
+  onAnimationTick({ animation, camera }) {
     const {
       auxMatrixA: rotation,
       auxVector: vector,
@@ -109,7 +109,7 @@ class Player extends Object3D {
         index: gamepad.buttons[0] && gamepad.buttons[0].pressed,
         middle: gamepad.buttons[1] && gamepad.buttons[1].pressed,
       });
-      hand.animate({ delta });
+      hand.animate(animation);
       marker.visible = false;
       matrixWorld.decompose(worldspace.position, worldspace.quaternion, vector);
       rotation.identity().extractRotation(matrixWorld);
@@ -123,7 +123,7 @@ class Player extends Object3D {
     if (!destination) {
       return;
     }
-    const step = speed * delta;
+    const step = speed * animation.delta;
     const distance = destination.distanceTo(position);
     if (distance <= step) {
       position.copy(destination);

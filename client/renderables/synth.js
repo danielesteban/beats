@@ -1,37 +1,41 @@
 import {
-  BoxGeometry,
-  BufferGeometry,
+  BoxBufferGeometry,
+  BufferAttribute,
+  BufferGeometryUtils,
   Color,
   InstancedMesh,
   MeshBasicMaterial,
   Object3D,
   Vector3,
-  VertexColors,
 } from '../core/three.js';
 
 // Synth particles
 
 class Synth extends InstancedMesh {
   static setupGeometry() {
-    const box = new BoxGeometry(0.02, 0.02, 0.02, 2, 2, 2);
-    box.faces.forEach((face, i) => {
-      if (i % 2 === 1) {
-        face.color.offsetHSL(0, 0, Math.random() * -0.1);
-        box.faces[i - 1].color.copy(face.color);
+    const box = new BoxBufferGeometry(0.02, 0.02, 0.02, 2, 2, 2);
+    box.deleteAttribute('normal');
+    box.deleteAttribute('uv');
+    const geometry = box.toNonIndexed();
+    const { count } = geometry.getAttribute('position');
+    const color = new BufferAttribute(new Float32Array(count * 3), 3);
+    let light;
+    for (let i = 0; i < count; i += 1) {
+      if (i % 6 === 0) {
+        light = 0.8 - Math.random() * 0.2;
       }
-    });
-    box.rotateY(Math.PI * 0.25);
-    box.rotateX(Math.PI * -0.25);
-    const geometry = (new BufferGeometry()).fromGeometry(box);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
-    Synth.geometry = geometry;
+      color.setXYZ(i, light, light, light);
+    }
+    geometry.setAttribute('color', color);
+    geometry.rotateY(Math.PI * 0.25);
+    geometry.rotateX(Math.PI * -0.25);
+    Synth.geometry = BufferGeometryUtils.mergeVertices(geometry);
   }
 
   static setupMaterial() {
     Synth.material = new MeshBasicMaterial({
-      color: (new Color(0xffe0bd)).convertGammaToLinear(2.2),
-      vertexColors: VertexColors,
+      color: (new Color(0xffe0bd)).convertSRGBToLinear(),
+      vertexColors: true,
     });
   }
 

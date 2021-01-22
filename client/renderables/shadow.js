@@ -10,8 +10,8 @@ class Shadow extends Mesh {
   static setupGeometry() {
     const geometry = new CircleBufferGeometry(0.5, 32);
     geometry.rotateX(Math.PI * -0.5);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
+    geometry.deleteAttribute('normal');
+    geometry.deleteAttribute('uv');
     Shadow.geometry = geometry;
   }
 

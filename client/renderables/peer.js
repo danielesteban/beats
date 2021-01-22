@@ -1,11 +1,11 @@
 import {
-  BufferGeometry,
+  BufferAttribute,
+  BufferGeometryUtils,
+  IcosahedronBufferGeometry,
   Mesh,
   MeshBasicMaterial,
   Object3D,
   PositionalAudio,
-  SphereGeometry,
-  VertexColors,
 } from '../core/three.js';
 import Hand from './hand.js';
 
@@ -13,22 +13,25 @@ import Hand from './hand.js';
 
 class Peer extends Object3D {
   static setupGeometry() {
-    const sphere = new SphereGeometry(0.15, 16, 32);
-    sphere.faces.forEach((face, i) => {
-      if (i % 2 === 1) {
-        face.color.offsetHSL(0, 0, Math.random() * -0.1);
-        sphere.faces[i - 1].color.copy(face.color);
+    const sphere = new IcosahedronBufferGeometry(0.15, 3);
+    sphere.deleteAttribute('normal');
+    sphere.deleteAttribute('uv');
+    const { count } = sphere.getAttribute('position');
+    const color = new BufferAttribute(new Float32Array(count * 3), 3);
+    let light;
+    for (let i = 0; i < count; i += 1) {
+      if (i % 3 === 0) {
+        light = 0.8 - Math.random() * 0.2;
       }
-    });
-    const geometry = (new BufferGeometry()).fromGeometry(sphere);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
-    Peer.geometry = geometry;
+      color.setXYZ(i, light, light, light);
+    }
+    sphere.setAttribute('color', color);
+    Peer.geometry = BufferGeometryUtils.mergeVertices(sphere);
   }
 
   static setupMaterial() {
     Peer.material = new MeshBasicMaterial({
-      vertexColors: VertexColors,
+      vertexColors: true,
     });
   }
 

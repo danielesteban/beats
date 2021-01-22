@@ -1,37 +1,41 @@
 import {
-  BoxGeometry,
-  BufferGeometry,
+  BoxBufferGeometry,
+  BufferAttribute,
+  BufferGeometryUtils,
   Mesh,
   MeshBasicMaterial,
-  VertexColors,
 } from '../core/three.js';
 
 // Display Stand
 
 class Stand extends Mesh {
   static setupGeometry() {
-    const box = new BoxGeometry(0.25, 1, 0.25, 4, 6, 4);
-    box.faces.forEach((face, i) => {
-      if (i % 2 === 1) {
-        face.color.setHSL(0, 0, 0.015 - Math.random() * 0.01);
-        box.faces[i - 1].color.copy(face.color);
+    const box = new BoxBufferGeometry(0.25, 1, 0.25, 4, 6, 4);
+    box.deleteAttribute('normal');
+    box.deleteAttribute('uv');
+    const geometry = box.toNonIndexed();
+    const position = geometry.getAttribute('position');
+    const { count } = position;
+    const color = new BufferAttribute(new Float32Array(count * 3), 3);
+    let light;
+    for (let i = 0; i < count; i += 1) {
+      if (i % 6 === 0) {
+        light = 0.015 - Math.random() * 0.01;
       }
-    });
-    box.vertices.forEach((v) => {
-      if (v.y === 0.5) {
-        v.y += (0.125 - v.z);
+      color.setXYZ(i, light, light, light);
+      const y = position.getY(i);
+      if (y === 0.5) {
+        position.setY(i, y + (0.125 - position.getZ(i)));
       }
-    });
-    box.translate(0, 0.5, 0);
-    const geometry = (new BufferGeometry()).fromGeometry(box);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
-    Stand.geometry = geometry;
+    }
+    geometry.setAttribute('color', color);
+    geometry.translate(0, 0.5, 0);
+    Stand.geometry = BufferGeometryUtils.mergeVertices(geometry);
   }
 
   static setupMaterial() {
     Stand.material = new MeshBasicMaterial({
-      vertexColors: VertexColors,
+      vertexColors: true,
     });
   }
 

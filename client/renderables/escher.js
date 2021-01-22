@@ -1,40 +1,49 @@
 import {
-  BoxGeometry,
-  BufferGeometry,
+  BoxBufferGeometry,
+  BufferAttribute,
+  BufferGeometryUtils,
   Frustum,
-  Geometry,
   InstancedMesh,
   Matrix4,
   MeshBasicMaterial,
   Object3D,
-  VertexColors,
 } from '../core/three.js';
 
 // Escher-ish background
 
 class Escher extends InstancedMesh {
   static setupGeometry() {
-    const box = (width, height, length) => {
-      const box = new BoxGeometry(width, height, length, width * 2, height * 2, length * 2);
-      box.faces.forEach((face, i) => {
-        if (i % 2 === 1) {
-          face.color.setHSL(0, 0, 0.015 - Math.random() * 0.01);
-          box.faces[i - 1].color.copy(face.color);
+    const box = (x, y, z, width, height, depth) => {
+      const box = new BoxBufferGeometry(width, height, depth, width * 2, height * 2, depth * 2);
+      box.deleteAttribute('normal');
+      box.deleteAttribute('uv');
+      const geometry = box.toNonIndexed();
+      const { count } = geometry.getAttribute('position');
+      const color = new BufferAttribute(new Float32Array(count * 3), 3);
+      let light;
+      for (let i = 0; i < count; i += 1) {
+        if (i % 6 === 0) {
+          light = 0.015 - Math.random() * 0.01;
         }
-      });
-      return box;
+        color.setXYZ(i, light, light, light);
+      }
+      geometry.setAttribute('color', color);
+      geometry.translate(x, y, z);
+      return geometry;
     };
-    const merged = new Geometry();
-    merged.merge(box(20, 1, 1).translate(0, 0, -10.5));
-    merged.merge(box(1, 1, 20).translate(-10.5, 0, 0));
-    merged.merge(box(1, 21, 1).translate(-10.5, 0, -10.5));
-    Escher.geometry = (new BufferGeometry()).fromGeometry(merged);
+    Escher.geometry = BufferGeometryUtils.mergeVertices(
+      BufferGeometryUtils.mergeBufferGeometries([
+        box(0, 0, -10.5, 20, 1, 1),
+        box(-10.5, 0, 0, 1, 1, 20),
+        box(-10.5, 0, -10.5, 1, 21, 1),
+      ])
+    );
     Escher.geometry.computeBoundingSphere();
   }
 
   static setupMaterial() {
     Escher.material = new MeshBasicMaterial({
-      vertexColors: VertexColors,
+      vertexColors: true,
     });
   }
 

@@ -1,7 +1,7 @@
 import {
-  BoxGeometry,
+  BufferAttribute,
   BoxBufferGeometry,
-  BufferGeometry,
+  BufferGeometryUtils,
   InstancedBufferAttribute,
   InstancedMesh,
   Mesh,
@@ -10,36 +10,35 @@ import {
   ShaderLib,
   ShaderMaterial,
   UniformsUtils,
-  VertexColors,
 } from '../core/three.js';
 
 // Instanced display
 
 class Display extends InstancedMesh {
   static setupGeometry() {
-    const pixel = new BoxGeometry(1, 1, 1, 1, 1, 1);
-    pixel.faces.splice(10, 2);
-    pixel.faces.forEach((face, i) => {
-      if (i % 2 === 1) {
-        face.color.setHSL(0, 0, i > 8 ? 1 : 0.5);
-        pixel.faces[i - 1].color.copy(face.color);
+    const pixel = new BoxBufferGeometry(1, 1, 1, 1, 1, 1);
+    pixel.deleteAttribute('normal');
+    pixel.deleteAttribute('uv');
+    const geometry = pixel.toNonIndexed();
+    geometry.setAttribute('position', new BufferAttribute(geometry.getAttribute('position').array.slice(0, 90), 3));
+    const { count } = geometry.getAttribute('position');
+    const color = new BufferAttribute(new Float32Array(count * 3), 3);
+    let light;
+    for (let i = 0; i < count; i += 1) {
+      if (i % 6 === 0) {
+        light = i >= 24 ? 1 : 0.5;
       }
-    });
-    Display.geometry = (new BufferGeometry()).fromGeometry(pixel);
-    Display.intersectGeometry = new BoxBufferGeometry(1, 1, 1, 1, 1, 1);
-    [
-      Display.geometry,
-      Display.intersectGeometry,
-    ].forEach((geometry) => {
-      delete geometry.attributes.normal;
-      delete geometry.attributes.uv;
-    });
+      color.setXYZ(i, light, light, light);
+    }
+    geometry.setAttribute('color', color);
+    Display.geometry = BufferGeometryUtils.mergeVertices(geometry);
+    Display.intersectGeometry = pixel;
   }
 
   static setupMaterial() {
     const material = new ShaderMaterial({
       name: 'display-material',
-      vertexColors: VertexColors,
+      vertexColors: true,
       fragmentShader: ShaderLib.basic.fragmentShader
         .replace(
           '#include <common>',

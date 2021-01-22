@@ -14,11 +14,11 @@ class Peers extends Object3D {
     }
   }
 
-  onAnimationTick({ delta, player }) {
+  onAnimationTick({ animation, player }) {
     const { peers } = this;
     peers.forEach(({ controllers }) => controllers.forEach((controller) => {
       if (controller.visible) {
-        controller.hand.animate({ delta });
+        controller.hand.animate(animation);
       }
     }));
     this.broadcast(player);

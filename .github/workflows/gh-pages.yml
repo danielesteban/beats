@@ -1,0 +1,15 @@
+name: docker
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: docker build -t danigatunes/beats .
+      - name: Deploy
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u danigatunes --password-stdin && docker push danigatunes/beats

@@ -1,34 +1,38 @@
 import {
-  BoxGeometry,
-  BufferGeometry,
+  BufferAttribute,
+  BoxBufferGeometry,
+  BufferGeometryUtils,
   InstancedMesh,
   MeshBasicMaterial,
   Object3D,
-  VertexColors,
 } from '../core/three.js';
 
 // Spectrum visualizer
 
 class Spectrum extends InstancedMesh {
   static setupGeometry() {
-    const box = new BoxGeometry(0.5, 0.5, 0.5, 3, 3, 3);
-    box.faces.forEach((face, i) => {
-      if (i % 2 === 1) {
-        face.color.setHSL(0, 0, 0.015 - Math.random() * 0.01);
-        box.faces[i - 1].color.copy(face.color);
+    const box = new BoxBufferGeometry(0.5, 0.5, 0.5, 3, 3, 3);
+    box.deleteAttribute('normal');
+    box.deleteAttribute('uv');
+    const geometry = box.toNonIndexed();
+    const { count } = geometry.getAttribute('position');
+    const color = new BufferAttribute(new Float32Array(count * 3), 3);
+    let light;
+    for (let i = 0; i < count; i += 1) {
+      if (i % 6 === 0) {
+        light = 0.015 - Math.random() * 0.01;
       }
-    });
-    box.rotateY(Math.PI * 0.25);
-    box.rotateX(Math.PI * -0.25);
-    const geometry = (new BufferGeometry()).fromGeometry(box);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
-    Spectrum.geometry = geometry;
+      color.setXYZ(i, light, light, light);
+    }
+    geometry.setAttribute('color', color);
+    geometry.rotateY(Math.PI * 0.25);
+    geometry.rotateX(Math.PI * -0.25);
+    Spectrum.geometry = BufferGeometryUtils.mergeVertices(geometry);
   }
 
   static setupMaterial() {
     Spectrum.material = new MeshBasicMaterial({
-      vertexColors: VertexColors,
+      vertexColors: true,
     });
   }
 

@@ -2,7 +2,6 @@ import {
   InstancedBufferAttribute,
   ShaderMaterial,
   UniformsUtils,
-  VertexColors,
 } from '../core/three.js';
 import Display from './display.js';
 
@@ -15,7 +14,7 @@ class SequencerDisplay extends Display {
     }
     const material = new ShaderMaterial({
       name: 'sequencer-display-material',
-      vertexColors: VertexColors,
+      vertexColors: true,
       fragmentShader: Display.material.fragmentShader
         .replace(
           '#include <common>',

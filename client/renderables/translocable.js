@@ -10,8 +10,8 @@ class Translocable extends Mesh {
   static setupGeometry() {
     const geometry = new PlaneBufferGeometry(1, 1, 1, 1);
     geometry.rotateX(Math.PI * -0.5);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
+    geometry.deleteAttribute('normal');
+    geometry.deleteAttribute('uv');
     Translocable.geometry = geometry;
   }
 

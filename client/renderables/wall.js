@@ -1,10 +1,10 @@
 import {
-  BufferGeometry,
+  BufferAttribute,
+  BufferGeometryUtils,
   DoubleSide,
   Mesh,
   MeshBasicMaterial,
-  PlaneGeometry,
-  VertexColors,
+  PlaneBufferGeometry,
 } from '../core/three.js';
 
 // Wall plane
@@ -13,7 +13,7 @@ class Wall extends Mesh {
   static setupMaterial() {
     Wall.material = new MeshBasicMaterial({
       side: DoubleSide,
-      vertexColors: VertexColors,
+      vertexColors: true,
     });
   }
 
@@ -21,9 +21,14 @@ class Wall extends Mesh {
     if (!Wall.material) {
       Wall.setupMaterial();
     }
-    const plane = new PlaneGeometry(width, height, width * 4, height * 4);
-    const xStride = 2;
-    const yStride = width * 8;
+    const plane = new PlaneBufferGeometry(width, height, width * 4, height * 4);
+    plane.deleteAttribute('normal');
+    plane.deleteAttribute('uv');
+    const geometry = plane.toNonIndexed();
+    const { count } = geometry.getAttribute('position');
+    const color = new BufferAttribute(new Float32Array(count * 3), 3);
+    const xStride = 6;
+    const yStride = width * 4 * 6;
     for (let y = 0; y < height; y += 1) {
       const ty = y * 4;
       for (let x = 0; x < width; x += 1) {
@@ -42,17 +47,15 @@ class Wall extends Mesh {
             l = (0.01 - (Math.random() * 0.004)) * light;
           }
           const i = (fy * yStride) + (fx * xStride);
-          const face = plane.faces[i];
-          face.color.setHSL(0, 0, l);
-          plane.faces[i + 1].color.copy(face.color);
+          for (let k = 0; k < 6; k += 1) {
+            color.setXYZ(i + k, l, l, l);
+          }
         }
       }
     }
-    const geometry = (new BufferGeometry()).fromGeometry(plane);
-    delete geometry.attributes.normal;
-    delete geometry.attributes.uv;
+    geometry.setAttribute('color', color);
     super(
-      geometry,
+      BufferGeometryUtils.mergeVertices(geometry),
       Wall.material
     );
   }

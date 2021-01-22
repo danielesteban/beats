@@ -60,8 +60,8 @@ class Song extends Scene {
     );
   }
 
-  onBeforeRender(renderer, scene, camera) {
-    super.onBeforeRender(renderer, scene, camera);
+  onAnimationTick({ animation, camera, xr }) {
+    super.onAnimationTick({ animation, camera, xr });
     const {
       audio,
       peers,
@@ -131,7 +131,7 @@ class Song extends Scene {
     });
     sequencer.step();
     spectrum.update({
-      animation: renderer.animation,
+      animation,
       bands: audio.analyser.getBands(),
     });
     synths.update({

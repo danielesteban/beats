@@ -29,7 +29,7 @@ if (!songs.cache.size) {
 }
 
 const server = express();
-server.use(helmet());
+server.use(helmet({ contentSecurityPolicy: false }));
 expressWS(server, null, { clientTracking: false });
 server.ws('/', songs.get.bind(songs));
 server.ws('/:song', songs.get.bind(songs));
